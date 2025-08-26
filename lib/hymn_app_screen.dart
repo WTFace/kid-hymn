@@ -15,8 +15,7 @@ class HymnAppScreen extends StatefulWidget {
 }
 
 class _HymnAppScreenState extends State<HymnAppScreen> {
-  // State for the currently displayed hymn page image
-  int _currentPageNumber = 1; // Default to the first page/image
+  int _currentPageNumber = 1;
 
   final List<Song> _allSongs = [
     Song(id: 1, title: '그 이름 높도다'),
@@ -308,7 +307,6 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
   ];
   List<Song> _filteredSongs = [];
   final TextEditingController _searchController = TextEditingController();
-  bool _showSearchResults = false;
   bool _isShowingSongList = true;
 
   @override
@@ -321,17 +319,15 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
 
   void _filterSongs() {
     final query = _searchController.text.toLowerCase();
-    if (mounted) { // Always good to check `mounted` before `setState` in async contexts or listeners
+    if (mounted) {
       setState(() {
-        if (query.isEmpty) {
-          _filteredSongs = _allSongs;
-        } else {
-          _filteredSongs = _allSongs.where((song) {
-            final titleMatches = song.title.toLowerCase().contains(query);
-            final idMatches = song.id.toString().contains(query);
-            return titleMatches || idMatches;
-          }).toList();
-        }
+        _filteredSongs = query.isEmpty
+            ? _allSongs
+            : _allSongs.where((song) {
+          final titleMatches = song.title.toLowerCase().contains(query);
+          final idMatches = song.id.toString().contains(query);
+          return titleMatches || idMatches;
+        }).toList();
       });
     }
   }
@@ -340,13 +336,10 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
     if (mounted) {
       setState(() {
         _currentPageNumber = song.id;
-        _isShowingSongList = false;
-        _searchController.clear();
-        _filteredSongs = _allSongs;
-        _showSearchResults = false;
+        _isShowingSongList = false; // Switch to image view
       });
     }
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).unfocus(); // Dismiss keyboard
   }
 
   @override
@@ -356,7 +349,6 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
     super.dispose();
   }
 
-  // Helper to get the current song title based on _currentPageNumber
   String _getCurrentSongTitle() {
     final currentSong = _allSongs.firstWhere(
             (song) => song.id == _currentPageNumber,
@@ -365,105 +357,114 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
     return currentSong.title;
   }
 
+  Widget _buildSearchField() {
+    return TextField(
+      controller: _searchController,
+      autofocus: true,
+      decoration: InputDecoration(
+        hintText: '번호, 제목 검색',
+        hintStyle: TextStyle(color: Colors.grey),
+        border: InputBorder.none,
+      ),
+      style: TextStyle(color: Colors.black),
+      cursorColor: Colors.white,
+    );
+  }
+
+  List<Widget> _buildListViewActions() {
+    if (_searchController.text.isNotEmpty) {
+      return [
+        IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            if (mounted) {
+              setState(() {
+                _searchController.clear();
+              });
+              FocusScope.of(context).unfocus();
+            }
+          },
+        ),
+      ];
+    }
+    return [];
+  }
+
+  List<Widget> _buildImageViewActions() {
+    return [
+      IconButton(
+        icon: Icon(Icons.list),
+        onPressed: () {
+          if (mounted) {
+            setState(() {
+              _isShowingSongList = true;
+              // clear search when going back to list
+              // _searchController.clear();
+              // _filterSongs(); // if search is cleared
+            });
+          }
+        },
+      ),
+    ];
+  }
+
+  Widget _buildSongListWidget() {
+    if (_searchController.text.isNotEmpty && _filteredSongs.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            "No songs found for '${_searchController.text}'",
+            style: TextStyle(fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: _filteredSongs.length,
+      itemBuilder: (context, index) {
+        final song = _filteredSongs[index];
+        return ListTile(
+          title: Text('${song.id}장 ${song.title}'),
+          onTap: () => _handleSongSelection(song),
+        );
+      },
+    );
+  }
+
+  Widget _buildImageViewWidget() {
+    final String currentImagePath = 'assets/hymns/$_currentPageNumber.jpg';
+    return Center(
+      child: Image.asset(
+        currentImagePath,
+        fit: BoxFit.contain,
+        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 50),
+                SizedBox(height: 10),
+                Text('Error loading image for page $_currentPageNumber.'),
+                Text('Path: $currentImagePath'),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-        final String currentImagePath = 'assets/hymns/$_currentPageNumber.jpg';
-
     return Scaffold(
       appBar: AppBar(
-        title: _showSearchResults
-            ? TextField(
-          controller: _searchController,
-          autofocus: true, // Open keyboard when search becomes active
-          decoration: InputDecoration(
-            hintText: 'Search',
-            hintStyle: TextStyle(color: Colors.white70),
-            border: InputBorder.none,
-          ),
-          style: TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
-        )
-            : Text(_getCurrentSongTitle()), // Show current song title or page number
-        actions: [
-          if (_showSearchResults)
-            IconButton(
-              icon: Icon(Icons.cancel),
-              onPressed: (){
-                if(mounted){
-                  setState(() {
-                    _searchController.clear();
-                    _showSearchResults = false;
-                    _filteredSongs = _allSongs;
-                  });
-                  FocusScope.of(context).unfocus();
-                }
-              },
-            )
-          else
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                if (mounted) {
-                  setState(() {
-                    _isShowingSongList = true;
-                    _showSearchResults = true;
-                  });
-                }
-              },
-            ),
-        ],
+        title: _isShowingSongList ? _buildSearchField() : Text(_getCurrentSongTitle()),
+        actions: _isShowingSongList ? _buildListViewActions() : _buildImageViewActions(),
       ),
-      body: Stack(
-        children: <Widget>[
-          Center(
-            child: Image.asset(
-              currentImagePath,
-              fit: BoxFit.contain, // Or BoxFit.cover, BoxFit.fill, etc.
-              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.red, size: 50),
-                        SizedBox(height: 10),
-                        Text('Error loading image for page $_currentPageNumber.'),
-                        Text('Path: $currentImagePath'),
-                      ],
-                    )
-                );
-              },
-
-            ),
-          ),
-
-          // Search Results List (overlay)
-          if (_showSearchResults && _filteredSongs.isNotEmpty)
-            Positioned.fill(
-              child: Container(
-                color: Theme.of(context).scaffoldBackgroundColor.withAlpha((0.95 * 255).round()), // Use theme background
-                child: ListView.builder(
-                  itemCount: _filteredSongs.length,
-                  itemBuilder: (context, index) {
-                    final song = _filteredSongs[index];
-                    return ListTile(
-                      title: Text('${song.id} ${song.title}'),
-                      onTap: () => _handleSongSelection(song),
-                    );
-                  },
-                ),
-              ),
-            ),
-          if (_showSearchResults && _searchController.text.isNotEmpty && _filteredSongs.isEmpty)
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(20),
-                color: Theme.of(context).scaffoldBackgroundColor.withAlpha((0.95 * 255).round()),
-                child: Text("No songs found for '${_searchController.text}'", style: TextStyle(fontSize: 16)),
-              ),
-            )
-        ],
-      ),
+      body: _isShowingSongList ? _buildSongListWidget() : _buildImageViewWidget(),
     );
   }
 }
