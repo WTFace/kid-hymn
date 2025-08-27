@@ -12,16 +12,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hymn App', // This title is used by the OS task switcher, etc.
+      title: 'Hymn App',
       theme: ThemeData(
-        primarySwatch: Colors.indigo, // Or Colors.blue, Colors.green, etc.
-        // You can also define darkTheme, themeMode, fonts, etc.
-        // visualDensity: VisualDensity.adaptivePlatformDensity, // Adjusts density based on platform
+        primarySwatch: Colors.indigo,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.deepPurpleAccent,
+          foregroundColor: Colors.white,
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        // scaffoldBackgroundColor: Colors.grey, //  DEFAULT SCAFFOLD BACKGROUND
       ),
-      // The 'home' property specifies what the first screen of your app will be.
-      // Since HymnAppScreen is now imported, this should work without errors.
+
       home: const HymnAppScreen(),
-      debugShowCheckedModeBanner: false, // Optional: set to false to remove the debug banner
+      debugShowCheckedModeBanner: false,
     );
   }
 }

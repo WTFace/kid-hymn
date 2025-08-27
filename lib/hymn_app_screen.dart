@@ -354,7 +354,7 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
             (song) => song.id == _currentPageNumber,
         orElse: () => Song(title: 'Page $_currentPageNumber', id: _currentPageNumber) // Fallback
     );
-    return currentSong.title;
+    return '${currentSong.id} ${currentSong.title}';
   }
 
   Widget _buildSearchField() {
@@ -363,10 +363,10 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
       autofocus: true,
       decoration: InputDecoration(
         hintText: '번호, 제목 검색',
-        hintStyle: TextStyle(color: Colors.grey),
+        hintStyle: TextStyle(color: Colors.white70),
         border: InputBorder.none,
       ),
-      style: TextStyle(color: Colors.black),
+      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
       cursorColor: Colors.white,
     );
   }
@@ -393,7 +393,7 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
   List<Widget> _buildImageViewActions() {
     return [
       IconButton(
-        icon: Icon(Icons.list),
+        icon: Icon(Icons.search),
         onPressed: () {
           if (mounted) {
             setState(() {
@@ -415,7 +415,7 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Text(
             "No songs found for '${_searchController.text}'",
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 20),
             textAlign: TextAlign.center,
           ),
         ),
@@ -427,7 +427,10 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
       itemBuilder: (context, index) {
         final song = _filteredSongs[index];
         return ListTile(
-          title: Text('${song.id}장 ${song.title}'),
+          title: Text(
+              '${song.id}.  ${song.title}',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)
+          ),
           onTap: () => _handleSongSelection(song),
         );
       },
@@ -436,33 +439,39 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
 
   Widget _buildImageViewWidget() {
     final String currentImagePath = 'assets/hymns/$_currentPageNumber.jpg';
-    return Center(
-      child: Image.asset(
-        currentImagePath,
-        fit: BoxFit.contain,
-        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, color: Colors.red, size: 50),
-                SizedBox(height: 10),
-                Text('Error loading image for page $_currentPageNumber.'),
-                Text('Path: $currentImagePath'),
-              ],
-            ),
-          );
-        },
-      ),
+    return SingleChildScrollView(
+        child: Center(
+          child: Image.asset(
+            currentImagePath,
+            fit: BoxFit.fitWidth,
+            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 50),
+                    SizedBox(height: 10),
+                    Text('Error loading image for page $_currentPageNumber.'),
+                    Text('Path: $currentImagePath'),
+                  ],
+                ),
+              );
+            },
+          ),
+        )
     );
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _isShowingSongList ? _buildSearchField() : Text(_getCurrentSongTitle()),
+        title: _isShowingSongList ? _buildSearchField() : Text(
+          _getCurrentSongTitle(),
+        ),
         actions: _isShowingSongList ? _buildListViewActions() : _buildImageViewActions(),
+        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: _isShowingSongList ? _buildSongListWidget() : _buildImageViewWidget(),
     );
