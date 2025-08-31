@@ -439,28 +439,18 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
 
   Widget _buildImageViewWidget() {
     final String currentImagePath = 'assets/hymns/$_currentPageNumber.jpg';
-    return SingleChildScrollView(
-        child: Center(
-          child: Image.asset(
-            currentImagePath,
-            fit: BoxFit.fitWidth,
-            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.red, size: 50),
-                    SizedBox(height: 10),
-                    Text('Error loading image for page $_currentPageNumber.'),
-                    Text('Path: $currentImagePath'),
-                  ],
-                ),
-              );
-            },
-          ),
-        )
-    );
 
+    return SingleChildScrollView(
+      child: InteractiveViewer(
+        minScale: 0.5,
+        maxScale: 3.0,
+        child: Image.asset(
+          currentImagePath,
+          fit: BoxFit.fitWidth,
+        ),
+    )
+
+    );
   }
 
   @override
