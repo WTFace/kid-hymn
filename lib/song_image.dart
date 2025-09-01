@@ -12,14 +12,15 @@ class SongImage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: SingleChildScrollView(
+        child: SafeArea(
           child: InteractiveViewer(
-            // minScale: 0.5,
             maxScale: 3.0,
             child: Image.asset(
               currentImagePath,
               fit: BoxFit.fitWidth,
             ),
           )
+        )
 
       )
     );
