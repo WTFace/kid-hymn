@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'hymn_app_screen.dart';
+import 'song_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,7 +8,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your app.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,10 +23,9 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        // scaffoldBackgroundColor: Colors.grey, //  DEFAULT SCAFFOLD BACKGROUND
       ),
 
-      home: const HymnAppScreen(),
+      home: const SongList(),
       debugShowCheckedModeBanner: false,
     );
   }

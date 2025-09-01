@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hymn/song_image.dart';
 
 class Song {
   final int id;
@@ -7,16 +8,14 @@ class Song {
   Song({required this.id, required this.title});
 }
 
-class HymnAppScreen extends StatefulWidget {
-  const HymnAppScreen({super.key});
+class SongList extends StatefulWidget {
+  const SongList({super.key});
 
   @override
-  State<HymnAppScreen> createState() => _HymnAppScreenState();
+  State<SongList> createState() => _HymnAppScreenState();
 }
 
-class _HymnAppScreenState extends State<HymnAppScreen> {
-  int _currentPageNumber = 1;
-
+class _HymnAppScreenState extends State<SongList> {
   final List<Song> _allSongs = [
     Song(id: 1, title: '그 이름 높도다'),
     Song(id: 2, title: '나 주님 알기 전'),
@@ -307,13 +306,11 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
   ];
   List<Song> _filteredSongs = [];
   final TextEditingController _searchController = TextEditingController();
-  bool _isShowingSongList = true;
 
   @override
   void initState() {
     super.initState();
     _filteredSongs = _allSongs;
-    _currentPageNumber = _allSongs.isNotEmpty ? _allSongs.first.id : 1;
     _searchController.addListener(_filterSongs);
   }
 
@@ -333,13 +330,15 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
   }
 
   void _handleSongSelection(Song song) {
-    if (mounted) {
-      setState(() {
-        _currentPageNumber = song.id;
-        _isShowingSongList = false; // Switch to image view
-      });
-    }
-    FocusScope.of(context).unfocus(); // Dismiss keyboard
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SongImage(
+          pageNumber: song.id,
+          title: '${song.id} ${song.title}',
+        ),
+      ),
+    );
   }
 
   @override
@@ -347,14 +346,6 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
     _searchController.removeListener(_filterSongs);
     _searchController.dispose();
     super.dispose();
-  }
-
-  String _getCurrentSongTitle() {
-    final currentSong = _allSongs.firstWhere(
-            (song) => song.id == _currentPageNumber,
-        orElse: () => Song(title: 'Page $_currentPageNumber', id: _currentPageNumber) // Fallback
-    );
-    return '${currentSong.id} ${currentSong.title}';
   }
 
   Widget _buildSearchField() {
@@ -390,23 +381,6 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
     return [];
   }
 
-  List<Widget> _buildImageViewActions() {
-    return [
-      IconButton(
-        icon: Icon(Icons.search),
-        onPressed: () {
-          if (mounted) {
-            setState(() {
-              _isShowingSongList = true;
-              // clear search when going back to list
-              // _searchController.clear();
-              // _filterSongs(); // if search is cleared
-            });
-          }
-        },
-      ),
-    ];
-  }
 
   Widget _buildSongListWidget() {
     if (_searchController.text.isNotEmpty && _filteredSongs.isEmpty) {
@@ -437,33 +411,15 @@ class _HymnAppScreenState extends State<HymnAppScreen> {
     );
   }
 
-  Widget _buildImageViewWidget() {
-    final String currentImagePath = 'assets/hymns/$_currentPageNumber.jpg';
-
-    return SingleChildScrollView(
-      child: InteractiveViewer(
-        minScale: 0.5,
-        maxScale: 3.0,
-        child: Image.asset(
-          currentImagePath,
-          fit: BoxFit.fitWidth,
-        ),
-    )
-
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: _isShowingSongList ? _buildSearchField() : Text(
-          _getCurrentSongTitle(),
-        ),
-        actions: _isShowingSongList ? _buildListViewActions() : _buildImageViewActions(),
+        title: _buildSearchField(),
+        actions: _buildListViewActions(),
         backgroundColor: Colors.deepPurpleAccent,
       ),
-      body: _isShowingSongList ? _buildSongListWidget() : _buildImageViewWidget(),
+      body:  _buildSongListWidget(),
     );
   }
 }
