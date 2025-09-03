@@ -1,4 +1,4 @@
-package com.example.hymn
+package com.kid.hymn
 
 import io.flutter.embedding.android.FlutterActivity
 
