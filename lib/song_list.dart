@@ -129,7 +129,7 @@ class _HymnAppScreenState extends State<SongList> {
     Song(id: 110, title: '한 사람으로 말미암아서'),
     Song(id: 111, title: 'Ask, Seek and Knock'),
     Song(id: 112, title: 'God Made Me'),
-    Song(id: 113, title: 'John : '),
+    Song(id: 113, title: 'John 3:16 '),
     Song(id: 114, title: '걱정 근심 산 되어'),
     Song(id: 115, title: '기쁨 내 맘 속에 있네'),
     Song(id: 116, title: '나는 시냇가에 심긴 나무'),
