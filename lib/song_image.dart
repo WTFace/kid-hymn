@@ -10,7 +10,11 @@ class SongImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentImagePath = 'assets/hymns/$pageNumber.jpg';
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+        centerTitle: true,
+        // automaticallyImplyLeading: false,
+      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: InteractiveViewer(
