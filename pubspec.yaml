@@ -4,7 +4,7 @@ description: "Hymn for Starry kids"
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.2
+version: 1.0.3
 
 environment:
   sdk: ^3.9.0
@@ -24,6 +24,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.2.3
   package_info_plus: ^8.0.0
+  wakelock_plus: ^1.2.1
 
 flutter_launcher_icons:
   android: true
