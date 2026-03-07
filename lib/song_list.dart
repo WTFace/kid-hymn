@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hymn/song_image.dart';
 import 'package:hymn/song_data.dart';
 import 'package:hymn/bookmarks_screen.dart';
+import 'history_screen.dart';
+import 'package:hymn/app_drawer.dart';
 
 class SongList extends StatefulWidget {
   const SongList({super.key});
@@ -132,9 +134,17 @@ class _HymnAppScreenState extends State<SongList> {
     return Scaffold(
       appBar: AppBar(
         title: _buildSearchField(),
-        actions: _buildListViewActions(),
         backgroundColor: Colors.deepPurpleAccent,
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openEndDrawer(), // right side
+            ),
+          ),
+        ]
       ),
+      endDrawer: const AppDrawer(),
       body: _buildSongListWidget(),
     );
   }

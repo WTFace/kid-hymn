@@ -41,7 +41,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Favorites'),
+        title: const Text('Bookmarks'),
         centerTitle: true,
       ),
       body: _isLoading

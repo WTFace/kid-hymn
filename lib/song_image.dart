@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hymn/song_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SongImage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _SongImageState extends State<SongImage> {
   void initState() {
     super.initState();
     _loadBookmarkState();
+    AllSongs.addToHistory(widget.pageNumber);
   }
 
   Future<void> _loadBookmarkState() async {

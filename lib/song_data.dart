@@ -1,4 +1,4 @@
-// lib/song_data.dart
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Song {
   final int id;
@@ -298,4 +298,28 @@ class AllSongs {
   ];
 
   static List<Song> get() => _songs;
+
+  static Future<void> addToHistory(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> history = prefs.getStringList('view_history') ?? [];
+
+    history.remove(id.toString());
+    history.insert(0, id.toString());
+
+    if (history.length > 10) {
+      history = history.sublist(0, 10);
+    }
+    await prefs.setStringList('view_history', history);
+  }
+
+  static Future<List<Song>> getHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> historyIds = prefs.getStringList('view_history') ?? [];
+    List<Song> allSongs = get();
+
+    // Map IDs back to Song objects in the correct history order
+    return historyIds.map((id) =>
+        allSongs.firstWhere((song) => song.id == int.parse(id))
+    ).toList();
+  }
 }
